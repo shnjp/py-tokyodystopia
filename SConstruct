@@ -6,6 +6,6 @@ PINCLUDES = '-I' + distutils.sysconfig.get_python_inc()
 opts = Options()
 
 env = Environment(options=opts)
-env.AppendUnique(CFLAGS=['-Wall', PINCLUDES], LIBS=[PLIBS, 'tokyodystopia',  'tokyocabinet',  'bz2', 'z', 'pthread', 'm' , 'c'])
+env.AppendUnique(CFLAGS=['-g', '-Wall', PINCLUDES], LIBS=[PLIBS, 'tokyodystopia',  'tokyocabinet',  'bz2', 'z', 'pthread', 'm' , 'c'])
 env.AppendUnique()	  
-pyre = env.SharedLibrary('pykhufu' , ['pykhufu.c'], SHLIBPREFIX='')
+dystopia = env.SharedLibrary('_dystopia' , ['dystopia.c'], SHLIBPREFIX='')
