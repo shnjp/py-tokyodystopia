@@ -59,26 +59,37 @@ put(PyObject *self,PyObject *args){
     return Py_BuildValue("b",result);
 }
 
+static PyObject *idbinfo(PyObject *self, PyObject *args)
+{
+  PyObject *db;
+  TCIDB *idb;
+  int ecode;
+  uint64_t number, size;
+  PyObject *tuple;
+  if (!PyArg_ParseTuple(args, "O", &db))
+        return NULL;
+  idb = (TCIDB *) PyCObject_AsVoidPtr(db);
+  number = tcidbrnum(idb);
+  size = tcidbfsiz(idb);
+  tuple = Py_BuildValue("ii", number, size);
+  return tuple;
+}
+    
+
+
+
 static PyObject *search(PyObject *self, PyObject *args){
     const char *stext;
-    const char *dbname;
-    TCIDB *idb;
     int ecode, rnum, i;
     uint64_t *result;
-    char *text;
     PyObject* pList;
+    PyObject *db;
+    TCIDB *idb;
     
-    if (!PyArg_ParseTuple(args, "ss", &dbname, &stext))
+    if (!PyArg_ParseTuple(args, "Os", &db, &stext))
         return NULL;
-
-    /* create the object */
-    idb = tcidbnew();
-
-    /* open the database */
-    if(!tcidbopen(idb, dbname, IDBOREADER | IDBONOLCK)){
-        ecode = tcidbecode(idb);
-        fprintf(stderr, "open error: %s\n", tcidberrmsg(ecode));
-    }
+    
+    idb = (TCIDB *) PyCObject_AsVoidPtr(db);
     /* search records */
     result = tcidbsearch2(idb, stext, &rnum);
     pList = PyList_New(rnum);
@@ -93,15 +104,6 @@ static PyObject *search(PyObject *self, PyObject *args){
         fprintf(stderr, "search error: %s\n", tcidberrmsg(ecode));
     }
     
-    /* close the database */
-    if(!tcidbclose(idb)){
-        ecode = tcidbecode(idb);
-        fprintf(stderr, "close error: %s\n", tcidberrmsg(ecode));
-    }
-
-    /* delete the object */
-    tcidbdel(idb);
-
     return Py_BuildValue("O",pList);
 }
 
@@ -110,6 +112,7 @@ PyMethodDef methods[] = {
   {"search", search, METH_VARARGS},
   {"put", put, METH_VARARGS},
   {"close", idbclose, METH_VARARGS},
+  {"info", idbinfo, METH_VARARGS},
   {NULL, NULL},
 };
 
