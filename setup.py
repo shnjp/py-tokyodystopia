@@ -13,7 +13,7 @@ ext_modules = [
 ]
 
 setup(
-    name='tokyodystpia',
+    name='tokyodystopia',
     version='0.1',
     autho='Shin Adachi', author_email='shn@glucose.jp',
     description='Python binding for Tokyo Dystopia',
