@@ -36,7 +36,47 @@ static PyObject *TCQDB_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 static PyObject *TCQDB_error_from_qdb(TCQDB_object *self) {
 	int ecode = tcqdbecode(self->qdb);
 	
-	return PyErr_Format(Py_TCQDBError, "tcqdb returns error code %d", ecode);
+	return PyErr_Format(Py_TCQDBError, "tcqdb returns error %s (%d)",
+		tcqdberrmsg(ecode),
+		ecode);
+}
+
+static PyObject *TCQDB_tune(TCQDB_object *self, PyObject *args) {
+	int64_t etnum;
+	uint8_t opts;
+	
+	if(!PyArg_ParseTuple(args, "LB", &etnum, &opts))
+		return NULL;
+	
+	if(!tcqdbtune(self->qdb, etnum, opts))
+		return TCQDB_error_from_qdb(self);
+	
+	Py_RETURN_NONE;		
+}
+
+static PyObject *TCQDB_setcache(TCQDB_object *self, PyObject *args) {
+	int64_t icsize;
+	int32_t lcnum;
+	
+	if(!PyArg_ParseTuple(args, "Li", &icsize, &lcnum))
+		return NULL;
+	
+	if(!tcqdbsetcache(self->qdb, icsize, lcnum))
+		return TCQDB_error_from_qdb(self);
+	
+	Py_RETURN_NONE;	
+}
+
+static PyObject *TCQDB_setfwmmax(TCQDB_object *self, PyObject *args) {
+	uint32_t fwmmax;
+	
+	if(!PyArg_ParseTuple(args, "l", &fwmmax))
+		return NULL;
+	
+	if(!tcqdbsetfwmmax(self->qdb, fwmmax))
+		return TCQDB_error_from_qdb(self);
+	
+	Py_RETURN_NONE;	
 }
 
 static PyObject *TCQDB_open(TCQDB_object *self, PyObject *args) {
@@ -51,16 +91,14 @@ static PyObject *TCQDB_open(TCQDB_object *self, PyObject *args) {
 		return TCQDB_error_from_qdb(self);
 	}
 	
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;		
 }
 
 static PyObject *TCQDB_close(TCQDB_object *self) {
 	if(!tcqdbclose(self->qdb))
 		return TCQDB_error_from_qdb(self);
 	
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;		
 }
 
 static PyObject *TCQDB_put(TCQDB_object *self, PyObject *args) {
@@ -137,7 +175,39 @@ static PyObject *TCQDB_search(TCQDB_object *self, PyObject *args) {
 	return pyresult;
 }
 
+static PyObject *TCQDB_sync(TCQDB_object *self) {
+	bool result;
+	
+	Py_BEGIN_ALLOW_THREADS
+	result = tcqdbsync(self->qdb);
+	Py_END_ALLOW_THREADS
+	
+	if(!result)
+		return TCQDB_error_from_qdb(self);
+	
+	Py_RETURN_NONE;
+}
+
+static PyObject *TCQDB_optimize(TCQDB_object *self) {
+	bool result;
+	
+	Py_BEGIN_ALLOW_THREADS
+	result = tcqdboptimize(self->qdb);
+	Py_END_ALLOW_THREADS
+	
+	if(!result)
+		return TCQDB_error_from_qdb(self);
+	
+	Py_RETURN_NONE;
+}
+
 static PyMethodDef tcqdb_methods[] = {
+	{ "tune",	TCQDB_tune,		METH_VARARGS,
+	  "set the tuning parameters of a q-gram database object." },
+	{ "setcache",	TCQDB_setcache,		METH_VARARGS,
+	  "set the caching parameters of a q-gram database object." },
+	{ "setfwmmax",	TCQDB_setfwmmax,		METH_VARARGS,
+	  "set the maximum number of forward matching expansion of a q-gram database object." },
 	{ "open",	TCQDB_open,		METH_VARARGS,
 	  "open a q-gram database object." },
 	{ "close",	TCQDB_close,	METH_NOARGS,
@@ -148,6 +218,10 @@ static PyMethodDef tcqdb_methods[] = {
 	  "remove a record." },
 	{ "search",	TCQDB_search,	METH_VARARGS,
 	  "search a database." },
+	{ "sync",	TCQDB_sync,		METH_NOARGS,
+	  "sync the database." },
+	{ "optimize", TCQDB_optimize, METH_NOARGS,
+	  "optimize the database." },
 	{ NULL, NULL },
 };
 
