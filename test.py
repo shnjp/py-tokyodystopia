@@ -8,8 +8,8 @@ def test_qdb():
     qdbobj = TCQDB()
     
     # open
+    qdbobj.tune(1000000, TCQDB.QDBTBZIP)
     qdbobj.open('test.qdb', TCQDB.QDBOWRITER | TCQDB.QDBOCREAT)
-    
     qdbobj.put(1, u'あだちちん')
     qdbobj.put(2, u'あだちめぐみ')
     qdbobj.put(3, u'あだちえりこ')

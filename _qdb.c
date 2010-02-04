@@ -36,7 +36,7 @@ static PyObject *TCQDB_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 static PyObject *TCQDB_error_from_qdb(TCQDB_object *self) {
 	int ecode = tcqdbecode(self->qdb);
 	
-	return PyErr_Format(Py_TCQDBError, "tcqdb returns error %s (%d)",
+	return PyErr_Format(Py_TCQDBError, "tcqdb returns error `%s` (%d)",
 		tcqdberrmsg(ecode),
 		ecode);
 }
@@ -60,7 +60,7 @@ static PyObject *TCQDB_setcache(TCQDB_object *self, PyObject *args) {
 	
 	if(!PyArg_ParseTuple(args, "Li", &icsize, &lcnum))
 		return NULL;
-	
+		
 	if(!tcqdbsetcache(self->qdb, icsize, lcnum))
 		return TCQDB_error_from_qdb(self);
 	
@@ -294,7 +294,18 @@ void init_qdb(){
 	PyModule_AddIntConstant(module, "QDBOTRUNC", QDBOTRUNC);
 	PyModule_AddIntConstant(module, "QDBONOLCK", QDBONOLCK);
 	PyModule_AddIntConstant(module, "QDBOLCKNB", QDBOLCKNB);
-	
+
+	PyModule_AddIntConstant(module, "QDBTLARGE", QDBTLARGE);
+	PyModule_AddIntConstant(module, "QDBTDEFLATE", QDBTDEFLATE);
+	PyModule_AddIntConstant(module, "QDBTBZIP", QDBTBZIP);
+	PyModule_AddIntConstant(module, "QDBTTCBS", QDBTTCBS);
+
+	PyModule_AddIntConstant(module, "QDBSSUBSTR", QDBSSUBSTR);
+	PyModule_AddIntConstant(module, "QDBSPREFIX", QDBSPREFIX);
+	PyModule_AddIntConstant(module, "QDBSSUFFIX", QDBSSUFFIX);
+	PyModule_AddIntConstant(module, "QDBSFULL", QDBSFULL);
+
+/*	
 	PyModule_AddIntConstant(module, "TCESUCCESS", TCESUCCESS);
 	PyModule_AddIntConstant(module, "TCETHREAD", TCETHREAD);
 	PyModule_AddIntConstant(module, "TCEINVALID", TCEINVALID);
@@ -302,6 +313,7 @@ void init_qdb(){
 	PyModule_AddIntConstant(module, "TCENOPERM", TCENOPERM);
 	PyModule_AddIntConstant(module, "TCEMETA", TCEMETA);
 	PyModule_AddIntConstant(module, "TCERHEAD", TCERHEAD);
+ */
 }
 
 #if 0
