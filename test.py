@@ -1,7 +1,10 @@
 # -*- coding:utf-8 -*-
-import os, sys
+import os
+import sys
 
-sys.path.insert(0, os.path.join('build', 'lib.freebsd-7.2-RELEASE-p2-amd64-2.6'))
+sys.path.insert(0, os.path.join('build',
+    'lib.freebsd-7.2-RELEASE-p2-amd64-2.6'))
+
 
 def test_qdb():
     from tokyodystopia import TCQDB

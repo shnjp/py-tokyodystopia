@@ -12,8 +12,11 @@ __version__ = '0.1'
 import sys
 import _qdb
 
+
 # extract hear
 TCQDB = _qdb.TCQDB
+
+
 class TCQDB(_qdb.TCQDB):
     for key in dir(_qdb):
         if key.startswith('QDB'):
